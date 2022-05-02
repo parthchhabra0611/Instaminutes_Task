@@ -1,0 +1,49 @@
+Q1
+Firstly, one has to understand the difference between extractive and abstractive summarisation.
+
+Extractive summarisation - Based on binary classification or based on scoring of each sentence (or grams) relative to the document to get the most important portion of text.
+
+Abstractive summarisation - Based on MLM task (Masked Language Modelling), wherein some part of text is masked to be predicted by the network. Basically, it is a text-to-text task where the summarised text is often different than the original text but similar in context.
+
+The given problem is of Extractive summarisation where important text has to be extracted from within the text as it is.
+
+The proposed model to tackle this would definitely be a transformer given their pretraining on huge data learning the embeddings in a diverse way. T5 (Text-To-Text Transfer Transformer) is a transformer model that is trained in an end-to-end manner with text as input and modified text as output but it is usually used for abstractive summarisation, hence it would not be suitable acoording to me.
+
+Here, I propose Bert Sum model for the reasons discussed below.
+
+For the purpose of extractive summarisation, two problems need to be overcome by Bert and similar models:
+1. Each sentence needs to be labeled as either a summary sentence or a nonsummary sentence. By default, however, BERT outputs token representations, not sentence representations, and no classifications either.
+2. BERT accepts inputs of either a single sentence or a pair of sentences. For summarisation purposes, however, the model should be able to process documents containing multiple sentences.
+
+According to the authors of Bert-Sum paper, there are several ways the author suggests to fine-tune BERT for extractive summarisation:
+1. Adding a single sigmoid classification layer on top of the BERT ouputs.
+2. Adding more Transformer layers on top of the BERT output. (Inter-sentence
+Transformer) On top of that, a sigmoid classification layer.
+3. Adding an LSTM on top of the BERT outputs. On top of that, a sigmoid
+classification layer.
+
+
+ROUGE Score: It works by comparing an automatically produced summary or translation against a set of reference summaries (typically human-produced).
+Binary Labels: As per the BertSum paper, binary labels are generated for
+the sequence-labeling problem definition. Up to three sentences(the pre-determined
+length of summaries) are selected from each news article (that comprise the data), by maximize the ROUGE scores against the summaries. 
+ 
+
+So, I would propose fine-tuning the Bert Sum model on custom dataset to obtain desired results with ROUGE Score as the evaluation metric.
+
+
+
+Q2
+For labelling the data for training, I propose 2 methods.
+
+1st Method:
+Using Named Entity Recognition to find sentences containing entities that might give crucial information about the context being discussed in the meeting.
+The sentences containing the entities detected by Spacy's NER are selected as the output for the summarisation. 
+The implementation of this is fairly simple and give about satisfactory results given this being more of an unsupervised approach than a supervised one.
+
+2nd Method:
+This is done in 2 ways. First one is using already pretrained Bert Sum model to get summarisation on inference.
+Second way is to find word frequency of each word in the corpus, then calculating the sentence score (adding up word frequency of that sentence), then finding the most relevant sentences based on this score. This is a naive approach but gives good results to begin with.
+Both the approaches can yield good results after post processing either by using fine-tuning or by developing a novel algorithm which takes up more aspects than word frequency.
+
+The code is shown with highlighted text for each method in the notebook and can be studied further to get the optimal approach.
